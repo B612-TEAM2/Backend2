@@ -1,17 +1,13 @@
 package com.b6122.ping.repository;
 
 import com.b6122.ping.domain.Post;
-
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import org.springframework.stereotype.Repository;
 
-import java.lang.management.RuntimeMXBean;
 import java.util.List;
 
 @Repository
@@ -60,7 +56,7 @@ public class PostRepository {
                 .getSingleResult();
     }
 
-//    @Query("SELECT p FROM Post p WHERE p.user.id= :uid  ORDER BY p.createdDate DESC")
+    //    @Query("SELECT p FROM Post p WHERE p.user.id= :uid  ORDER BY p.createdDate DESC")
     public List<Post> findByUid(Long uid){
         return em.createQuery("select p from Post p" +
                         " where p.user.id = :uid" +
@@ -75,21 +71,20 @@ public class PostRepository {
     }
 
     public long updatePost(Post p) {
-        return em.createQuery("update Post p set location =:location, latitude =:latitude, longitude =:longitude, title =:title, content =:content, scope =:scope, imgPaths =:imgPaths", Long.class)
+        return em.createQuery("update Post p set location =:location, latitude =:latitude, longitude =:longitude, title =:title, content =:content, scope =:scope, postImgObjectsName =:postImgObjectsName", Long.class)
                 .setParameter("location", p.getLocation())
                 .setParameter("latitude", p.getLatitude())
                 .setParameter("longitude", p.getLongitude())
                 .setParameter("title", p.getTitle())
                 .setParameter("content", p.getContent())
                 .setParameter("scope", p.getScope())
-                .setParameter("imgPaths", p.getImgPaths())
+                .setParameter("postImgObjectsName", p.getPostImgObjectsName())
                 .executeUpdate();
     }
 
     public List<Post> findNonePrivateByUid(Long uid) {
         return em.createQuery("select p from Post p" +
-
-                " where p.user.id = :uid and p.scope != \"private\" " +
+                        " where p.user.id = :uid and p.scope != \"private\" " +
                         "order by p.createdDate", Post.class) //최신순
                 .setParameter("uid", uid)
                 .getResultList();
@@ -97,8 +92,8 @@ public class PostRepository {
 
     public List<Post> findPublicPosts(float longitude, float latitude) {
         return em.createQuery("select p from Post p"+
-                " where p.scope = \"public\" and ST_Distance_Sphere(POINT(p.longitude, p.latitude), POINT(longitude, latitude)) <= 2000"+
-                "order by p.createdDate", Post.class)
+                        " where p.scope = \"public\" and ST_Distance_Sphere(POINT(p.longitude, p.latitude), POINT(longitude, latitude)) <= 2000" +
+                        "order by p.createdDate", Post.class)
                 .getResultList();
     }
 }
