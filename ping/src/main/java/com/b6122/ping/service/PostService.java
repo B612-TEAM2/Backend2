@@ -1,8 +1,6 @@
 package com.b6122.ping.service;
 
-import com.b6122.ping.domain.Like;
 import com.b6122.ping.domain.Post;
-import com.b6122.ping.domain.PostScope;
 import com.b6122.ping.domain.User;
 import com.b6122.ping.dto.PostDto;
 import com.b6122.ping.repository.LikeRepository;
@@ -12,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,7 @@ public class PostService {
     private final UserDataRepository userDataRepository;
 
     @Transactional
-    public Long createPost(PostDto postDto) {
+    public Long createPost(PostDto postDto, List<MultipartFile> imgs) {
         Post post;
         post = new Post();
         User user = userDataRepository.findById(postDto.getUid()).orElseThrow(RuntimeException::new);
@@ -45,20 +43,13 @@ public class PostService {
         post.setViewCount(postDto.getViewCount());
         post.setLikeCount(postDto.getLikeCount());
         post.setLikes(postDto.getLikes());
-        if(postDto.getImgs() != null) {
-            //이미지 저장 MultiPartfile->path
-
-            List<String> paths = post.saveImagesInStorage(postDto.getImgs());
-            for (String path : paths) {
-                post.addImgPath(path);
-            }
-        }
+        post.setPostImgObjectsName(imgs);
         return postRepository.save(post);
     }
 
     //post 수정
     @Transactional
-    public Long modifyPost(PostDto postDto) {
+    public Long modifyPost(PostDto postDto,List<MultipartFile> imgs) {
 
         Post post = postRepository.findById(postDto.getId());
         post.setId(postDto.getId());
@@ -68,13 +59,8 @@ public class PostService {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setScope(postDto.getScope());
-        if(postDto.getImgs() != null) {
-            //이미지 저장 MultiPartfile->path
-            List<String> paths = post.saveImagesInStorage(postDto.getImgs());
-            for (String path : paths) {
-                post.addImgPath(path);
-            }
-        }
+        //수정 전 이미지 파일을 삭제하는코드 추가해야함
+        post.setPostImgObjectsName(imgs);
         return post.getId();
     }
 
@@ -112,31 +98,28 @@ public class PostService {
         likeRepository.save(insertLikePids, uid);
     }
 
-        //pin 클릭시 해당 위치의 postList 반환,home friend public 동일한 함수 사용
-        public List<PostDto> getPostsPreviewPin(List<Long> pids) {
-            List<Post> posts = new ArrayList<>();
-            for (Long pid : pids) {
-                posts.add(postRepository.findById(pid));
-            }
-            return posts.stream().map(PostDto::postPreviewMap).collect(Collectors.toList());
+    //pin 클릭시 해당 위치의 postList 반환,home friend public 동일한 함수 사용
+    public List<PostDto> getPostsPreviewPin(List<Long> pids) {
+        List<Post> posts = new ArrayList<>();
+        for (Long pid : pids) {
+            posts.add(postRepository.findById(pid));
         }
+        return posts.stream().map(PostDto::postPreviewMap).collect(Collectors.toList());
+    }
 
 
-        //Home
-        //Home-Map 클릭 전, 내가 작성한 모든 글의 pin띄우기
-        public List<PostDto> getPinsHomeMap ( long uid){
-            List<Post> posts = postRepository.findByUid(uid);
-            return posts.stream().map(PostDto::pinMap).collect(Collectors.toList());
-        }
+    //Home
+    //Home-Map 클릭 전, 내가 작성한 모든 글의 pin띄우기
+    public List<PostDto> getPinsHomeMap ( long uid){
+        List<Post> posts = postRepository.findByUid(uid);
+        return posts.stream().map(PostDto::pinMap).collect(Collectors.toList());
+    }
 
-        //Home-List 토글, postList 반환
-        public List<PostDto> getPostsHomeList (Long uid){
-            List<Post> posts = postRepository.findByUid(uid);
-
-            return posts.stream()
-                    .map(post -> PostDto.postPreviewList(post, likeRepository))
-                    .collect(Collectors.toList());
-        }
+    //Home-List 토글, postList 반환
+    public List<PostDto> getPostsHomeList (Long uid){
+        List<Post> posts = postRepository.findByUid(uid);
+        return posts.stream().map(post -> PostDto.postPreviewList(post, likeRepository)).collect(Collectors.toList());
+    }
 
 
 
@@ -146,37 +129,37 @@ public class PostService {
     public List<PostDto> getPinsFriendsMap(List<Long> uids) {
         List<Post> posts = new ArrayList<>();
         for(Long uid : uids){
-             posts.addAll(postRepository.findNonePrivateByUid(uid));
+            posts.addAll(postRepository.findNonePrivateByUid(uid));
         }
 
         return posts.stream().map(PostDto::pinMap).collect(Collectors.toList());
     }
 
 
-        //친구 post list preview
-        public List<PostDto> getPostsFriendsList (List < Long > uids) {
-            List<Post> posts = new ArrayList<>();
-            for (Long uid : uids) {
-                posts.addAll(postRepository.findNonePrivateByUid(uid));
-            }
-
-            return posts.stream()
-                    .map(post -> PostDto.postPreviewList(post, likeRepository))
-                    .collect(Collectors.toList());
+    //친구 post list preview
+    public List<PostDto> getPostsFriendsList (List < Long > uids) {
+        List<Post> posts = new ArrayList<>();
+        for (Long uid : uids) {
+            posts.addAll(postRepository.findNonePrivateByUid(uid));
         }
-
-
-        //Public
-        public List<PostDto> getPinsPublicMap ( float longitude, float latitude){
-            List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
-            return posts.stream().map(PostDto::pinMap).collect(Collectors.toList());
-        }
-
-        public List<PostDto> getPostsPublicList ( float longitude, float latitude){
-            List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
-
-            return posts.stream()
-                    .map(post -> PostDto.postPreviewList(post, likeRepository))
-                    .collect(Collectors.toList());
-        }
+        return posts.stream()
+                .map(post -> PostDto.postPreviewList(post, likeRepository))
+                .collect(Collectors.toList());
     }
+
+
+    //Public
+    public List<PostDto> getPinsPublicMap ( float longitude, float latitude){
+        List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
+        return posts.stream().map(PostDto::pinMap).collect(Collectors.toList());
+    }
+
+
+    public List<PostDto> getPostsPublicList ( float longitude, float latitude){
+        List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
+
+        return posts.stream()
+                .map(post -> PostDto.postPreviewList(post, likeRepository))
+                .collect(Collectors.toList());
+    }
+}
