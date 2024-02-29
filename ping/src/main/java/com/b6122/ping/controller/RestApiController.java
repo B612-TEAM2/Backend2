@@ -44,7 +44,7 @@ public class RestApiController {
 //            oauthLogin(server, code);
 //    }
 
-    @GetMapping("/jwt/access")
+    @PostMapping("/jwt/access")
     public void jwt() {
 
     }

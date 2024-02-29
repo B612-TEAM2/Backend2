@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,14 +23,16 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import java.io.IOException;
 import java.util.Map;
 
+
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private UserDataRepository userDataRepository;
-    private JwtService jwtService;
+    private final UserDataRepository userDataRepository;
+    private final JwtService jwtService;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDataRepository userDataRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDataRepository userDataRepository, JwtService jwtService) {
         super(authenticationManager);
         this.userDataRepository = userDataRepository;
+        this.jwtService = jwtService;
     }
 
     @Override
