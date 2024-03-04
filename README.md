@@ -13,7 +13,7 @@ https://hongik-b612.notion.site/About-B612-6fba9fb0ec6c4a58bb1ed58b7b7dd641
 
 ## Backend
 - TEAM2 백엔드 멤버: 김환준, 유지예
-- 
+
 ## 사용 기술
 - SpringBoot
 - Spring Data JPA
