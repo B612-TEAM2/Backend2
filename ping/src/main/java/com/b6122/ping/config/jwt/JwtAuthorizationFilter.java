@@ -7,7 +7,6 @@ import com.b6122.ping.auth.PrincipalDetails;
 import com.b6122.ping.domain.User;
 import com.b6122.ping.dto.UserDto;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
-import com.b6122.ping.service.JwtService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,12 +25,12 @@ import java.util.Map;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final UserDataRepository userDataRepository;
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDataRepository userDataRepository, JwtService jwtService) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDataRepository userDataRepository, JwtProvider jwtProvider) {
         super(authenticationManager);
         this.userDataRepository = userDataRepository;
-        this.jwtService = jwtService;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -58,7 +57,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             if(tokenType.equals("refresh")) {
                 UserDto userDto = new UserDto(user.getId(), username);
-                Map<String, String> jwtAccessToken = jwtService.createJwtAccessToken(userDto);
+                Map<String, String> jwtAccessToken = jwtProvider.createJwtAccessToken(userDto);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("{\"access-token\": \"" + jwtAccessToken.get("access-token") + "\"}");
                 return;

@@ -1,21 +1,18 @@
-package com.b6122.ping.service;
+package com.b6122.ping.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.b6122.ping.config.jwt.JwtProperties;
 import com.b6122.ping.dto.UserDto;
-import com.b6122.ping.repository.datajpa.UserDataRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
-public class JwtService {
-
-    private final UserDataRepository userDataRepository;
+@Component
+public class JwtProvider {
 
     /**
      * 사용자 정보를 바탕으로 Jwt AccessToken 발급
