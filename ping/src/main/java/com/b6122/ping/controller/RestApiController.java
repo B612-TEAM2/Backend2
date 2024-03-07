@@ -1,6 +1,7 @@
 package com.b6122.ping.controller;
 
 import com.b6122.ping.auth.PrincipalDetails;
+import com.b6122.ping.config.jwt.JwtProvider;
 import com.b6122.ping.dto.*;
 import com.b6122.ping.service.*;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RequestMapping("/api")
 public class RestApiController {
 
-    private final JwtService jwtService;
+    private final JwtProvider jwtProvider;
     private final UserService userService;
     private final FriendshipService friendshipService;
     private final OauthService oauthService;
@@ -42,7 +43,7 @@ public class RestApiController {
                                                           @RequestBody Map<String, Object> request) throws IOException {
 
         UserDto joinedUser = oauthService.join(server, request.get("code").toString());
-        return ResponseEntity.ok().body(jwtService.createJwtAccessAndRefreshToken(joinedUser));
+        return ResponseEntity.ok().body(jwtProvider.createJwtAccessAndRefreshToken(joinedUser));
     }
 
     @PostMapping("/profile")
