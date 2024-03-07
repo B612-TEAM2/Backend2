@@ -28,27 +28,15 @@ public class RestApiController {
     private final FriendshipService friendshipService;
     private final OauthService oauthService;
 
-    //프론트엔드로부터 authorization code 받고 -> 그 code로 카카오에 accesstoken 요청
-    // 받아 온 access token으로 카카오 리소스 서버로부터 카카오 유저 정보 가져오기
-    // 가져온 정보를 기반으로 회원가입
-    // jwt accessToken을 리액트 서버에 return
-//    @PostMapping("/oauth/jwt")
-//    public ResponseEntity<Map<String, Object>> oauthLogin(String server, String code) throws IOException {
-//        UserDto joinedUser = oauthService.join(server, code);
-//        return ResponseEntity.ok().body(jwtService.createJwtAccessAndRefreshToken(joinedUser));
-//    }
-//
-//    @GetMapping("/auth/{serverName}/callback")
-//    public void getCode(@PathVariable("serverName") String server,
-//                          @RequestParam("code") String code) throws IOException {
-//            oauthLogin(server, code);
-//    }
-
     @PostMapping("/jwt/access")
     public void jwt() {
 
     }
 
+    //프론트엔드로부터 authorization code 받고 -> 그 code로 카카오에 accesstoken 요청
+    // 받아 온 access token으로 카카오 리소스 서버로부터 카카오 유저 정보 가져오기
+    // 가져온 정보를 기반으로 회원가입
+    // jwt accessToken을 리액트 서버에 return
     @PostMapping("/oauth/jwt/{serverName}")
     public ResponseEntity<Map<String, Object>> oauthLogin(@PathVariable("serverName") String server,
                                                           @RequestBody Map<String, Object> request) throws IOException {

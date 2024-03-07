@@ -11,6 +11,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -115,7 +116,17 @@ public class User {
             } catch(IOException e) {
                 e.printStackTrace();
             }
+
+            //기존에 업로드된 이미지가 있다면 삭제
+            if(!(this.profileImgObjectName.isEmpty())) {
+                try {
+                    deleteObject(bucketName, this.profileImgObjectName);
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
         this.nickname = reqDto.getNickname();
         this.profileImgObjectName = objectName;
     }
@@ -169,6 +180,21 @@ public class User {
         return result;
     }
 
+    private void deleteObject(String bucketName, String objectName) throws IOException{
+        HttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpDelete request = new HttpDelete(ENDPOINT + "/" + bucketName + "/" + objectName);
+        request.addHeader("Host", request.getURI().getHost());
+
+        try {
+            authorization(request, REGION_NAME, ACCESS_KEY, SECRET_KEY);
+        } catch (Exception e) {
+        }
+
+        HttpResponse response = httpClient.execute(request);
+        System.out.println("Response : " + response.getStatusLine());
+    }
+
     private void putObject(String bucketName, String objectName,
                            MultipartFile imgFile) throws IOException {
         HttpClient httpClient = HttpClientBuilder.create().build();
@@ -181,7 +207,6 @@ public class User {
         fileOutputStream.write(imgFile.getBytes());
         fileOutputStream.close();
 
-        //ACL 권한을 public-read로 설정.
         HttpPut request = new HttpPut(ENDPOINT + "/" + bucketName + "/" + objectName);
         request.addHeader("Host", request.getURI().getHost());
         request.setEntity(new FileEntity(file));
