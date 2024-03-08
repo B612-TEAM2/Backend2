@@ -124,17 +124,20 @@ public class Post extends TimeEntity {
     @Transient
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyyMMdd\'T\'HHmmss\'Z\'");
 
-    public void setPostImgObjectsName(List<MultipartFile> imgs) {
+    public List<String> putImgs(List<MultipartFile> imgs) {
+        List<String > objectNameList = new ArrayList<>();
+
         for (int i = 0; i < imgs.size(); i++) {
             String objectName = UUID.randomUUID() + "_" + imgs.get(i).getOriginalFilename();
             String bucketName = NcpObjectStorageConfig.PostImgBucketName;
             try {
                 putObject(bucketName, objectName, imgs.get(i));
-                this.postImgObjectsName.add(objectName); //update ImgName
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            objectNameList.add(objectName);
         }
+        return objectNameList;
     }
 
 

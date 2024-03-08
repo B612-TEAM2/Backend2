@@ -1,13 +1,14 @@
 package com.b6122.ping.service;
 
 import com.b6122.ping.domain.Post;
+import com.b6122.ping.domain.PostImage;
 import com.b6122.ping.domain.User;
 import com.b6122.ping.dto.PostDto;
 import com.b6122.ping.repository.LikeRepository;
 import com.b6122.ping.repository.PostRepository;
+import com.b6122.ping.repository.datajpa.PostImageDataRepository;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,13 +22,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    @Autowired
     private final PostRepository postRepository;
-
-    @Autowired
     private final LikeRepository likeRepository;
-
     private final UserDataRepository userDataRepository;
+    private final PostImageDataRepository postImageDataRepository;
 
     @Transactional
     public Long createPost(PostDto postDto, List<MultipartFile> imgs) {
@@ -44,12 +42,16 @@ public class PostService {
         post.setViewCount(postDto.getViewCount());
         post.setLikeCount(postDto.getLikeCount());
         post.setLikes(postDto.getLikes());
+        Long id = postRepository.save(post);
+
         if (imgs != null) {
-            System.out.println("createPost imgs = " + imgs);
-            System.out.println("createPost imgs = " + imgs);
-            post.setPostImgObjectsName(imgs);
+            List<String> objectNameList = post.putImgs(imgs);
+            for (String objectName : objectNameList) {
+                PostImage postImage = PostImage.createPostImage(post, objectName);
+                postImageDataRepository.save(postImage);
+            }
         }
-        return postRepository.save(post);
+        return id;
     }
 
     //post 수정
@@ -66,7 +68,7 @@ public class PostService {
         post.setScope(postDto.getScope());
         //수정 전 이미지 파일을 Ncp Object Storage에서 삭제
         post.deletePostImgObjectsInStorage(post.getPostImgObjectsName());
-        post.setPostImgObjectsName(imgs);
+        post.putImgs(imgs);
         return post.getId();
     }
 
