@@ -4,19 +4,14 @@ import com.b6122.ping.domain.Like;
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
 import com.b6122.ping.repository.LikeRepository;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
-
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
-
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
 import java.util.List;
 
 //dto 분리,메모리 효율을 위해
@@ -52,21 +47,21 @@ public class PostDto {
     private String contentPreview; //미리보기 15자
 
     //프론트에서 이미지 파일 받을때
-
     private List<MultipartFile> imgs;
     private MultipartFile firstImg;
 
-    private byte[] userImg;
-    private String userNickname;
-
+    private List<String> postImgObjectsName;
 
     //프론트로 이미지 파일 전달
     private byte[] imgByte;
     private List<byte[]> imgsByte;
+    private byte[] userImg;
+
+    private String userNickname;
+
 
     @OneToMany(mappedBy = "post")
     private List<Like> likes = new ArrayList<>();
-
 
 
 
@@ -88,7 +83,7 @@ public class PostDto {
         postDto.setScope(post.getScope());
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        postDto.setImgByte(post.getByteArrayOfFirstImgByPath()); //대표 이미지 가져오기
+        postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
         postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         postDto.setUserNickname(post.getUser().getNickname());
         return postDto;
@@ -105,7 +100,7 @@ public class PostDto {
         postDto.setMyLike(likeRepository.checkMyLike(post.getId(), post.getUser().getId()));//사용자가 post에 좋아요 눌렀다면 myLike == True
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        postDto.setImgByte(post.getByteArrayOfFirstImgByPath()); //대표 이미지 가져오기
+        postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
         postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         postDto.setUserNickname(post.getUser().getNickname());
         return postDto;
@@ -124,7 +119,7 @@ public class PostDto {
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setCreatedDate(post.getModifiedDate());
         postDto.setContent(post.getContent());
-        postDto.setImgsByte(post.getByteArraysOfImgsByPaths()); //모든 이미지 반환
+        postDto.setImgsByte(post.getPostImgObjectsBytes(post.getPostImgObjectsName())); //모든 이미지 가져오기
         postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         postDto.setUserNickname(post.getUser().getNickname());
         return postDto;
