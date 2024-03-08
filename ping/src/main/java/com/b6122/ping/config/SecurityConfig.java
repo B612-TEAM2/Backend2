@@ -40,7 +40,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin((formLogin) -> formLogin.disable())
-//                .addFilter(new JwtAuthenticationFilter((authenticationManager)))
                 .addFilter((new JwtAuthorizationFilter(authenticationManager, userDataRepository, jwtProvider)))
                 .httpBasic((httpBasic) -> httpBasic.disable()) //Bearer 방식을 사용하기 위해 basic 인증 비활성화
                 .authorizeHttpRequests((authorize) ->
@@ -49,8 +48,6 @@ public class SecurityConfig {
                                 .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                                 .requestMatchers("/**").hasAnyRole("ADMIN", "USER")
                                 .anyRequest().authenticated());
-
-
         return http.build();
     }
 }
