@@ -76,15 +76,15 @@ public class PostDto {
     }
 
     //Home-Map 토글, pin클릭시 postPreview보여주기
-    public static PostDto postPreviewMap(Post post) {
+    public static PostDto postPreviewMap(Post post, List<String> postImageNames) {
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
         postDto.setTitle(post.getTitle());
         postDto.setScope(post.getScope());
         postDto.setCreatedDate(post.getCreatedDate().toString());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        if(post.getPostImgObjectsName() != null) {
-            postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
+        if(!postImageNames.isEmpty()) {
+            postDto.setImgByte(post.getPostImgObjectBytes(postImageNames.get(0))); //대표 이미지 가져오기
         }
         if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
@@ -95,7 +95,7 @@ public class PostDto {
 
 
     //Home-List 토글
-    public static PostDto postPreviewList(Post post, LikeRepository likeRepository) {
+    public static PostDto postPreviewList(Post post, LikeRepository likeRepository, List<String> postImageNames) {
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
         postDto.setTitle(post.getTitle());
@@ -104,8 +104,8 @@ public class PostDto {
         postDto.setMyLike(likeRepository.checkMyLike(post.getId(), post.getUser().getId()));//사용자가 post에 좋아요 눌렀다면 myLike == True
         postDto.setCreatedDate(post.getCreatedDate().toString());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        if(post.getPostImgObjectsName() != null) {
-            postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
+        if(!postImageNames.isEmpty()) {
+            postDto.setImgByte(post.getPostImgObjectBytes(postImageNames.get(0))); //대표 이미지 가져오기
         }
         if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
@@ -116,7 +116,7 @@ public class PostDto {
 
 
     //글 보기
-    public static PostDto postInfo(Post post, LikeRepository likeRepository) {
+    public static PostDto postInfo(Post post, LikeRepository likeRepository, List<String> postImageNames) {
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
         postDto.setUid(post.getUser().getId());
@@ -127,8 +127,9 @@ public class PostDto {
         postDto.setCreatedDate(post.getCreatedDate().toString());
         postDto.setModifiedDate(post.getModifiedDate().toString());
         postDto.setContent(post.getContent());
-        if(post.getPostImgObjectsName() != null) {
-            postDto.setImgsByte(post.getPostImgObjectsBytes(post.getPostImgObjectsName())); //모든 이미지 가져오기
+
+        if(!postImageNames.isEmpty()) {
+            postDto.setImgsByte(post.getPostImgObjectsBytes(postImageNames)); //모든 이미지 가져오기
         }
         if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());

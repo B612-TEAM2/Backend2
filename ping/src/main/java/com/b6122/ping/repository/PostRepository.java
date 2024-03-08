@@ -25,15 +25,7 @@ public class PostRepository {
         return null;
     }
 
-
-    public List<String> getPostImgsName(Long pid){
-        return (List<String>) em.createQuery("Select postImgObjectsName From Post p Where p.pid =:pid", Post.class)
-                .setParameter("pid", pid)
-                .getSingleResult();
-    }
-
-
-    @Query("Delete FROM Post p WHERE p.pid = :pid")
+    @Query("Delete FROM Post p WHERE p.id = :pid")
     public List<Post> deletePost(@Param("pid") Long pid) {
         return null;
     }
@@ -79,14 +71,13 @@ public class PostRepository {
     }
 
     public long updatePost(Post p) {
-        return em.createQuery("update Post p set location =:location, latitude =:latitude, longitude =:longitude, title =:title, content =:content, scope =:scope, postImgObjectsName =:postImgObjectsName", Long.class)
+        return em.createQuery("update Post p set location =:location, latitude =:latitude, longitude =:longitude, title =:title, content =:content, scope =:scope", Long.class)
                 .setParameter("location", p.getLocation())
                 .setParameter("latitude", p.getLatitude())
                 .setParameter("longitude", p.getLongitude())
                 .setParameter("title", p.getTitle())
                 .setParameter("content", p.getContent())
                 .setParameter("scope", p.getScope())
-                .setParameter("postImgObjectsName", p.getPostImgObjectsName())
                 .executeUpdate();
     }
 
