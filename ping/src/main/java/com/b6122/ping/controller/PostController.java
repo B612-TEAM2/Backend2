@@ -54,9 +54,30 @@ public class PostController {
     }
 
     //글 수정 후 디비 저장
-    @PostMapping("/posts/home/edit")
-    public ResponseEntity modifyPost(@RequestBody @Validated PostDto postDto,
-                                     @RequestParam(value = "img", required = false) List<MultipartFile> imgs) throws IOException {
+    @PutMapping("/posts/home/edit/{postId}")
+    public ResponseEntity modifyPost(@RequestParam("title") String title,
+                                     @RequestParam("content") String content,
+                                     @RequestParam("latitude") float latitude,
+                                     @RequestParam("longitude") float longitude,
+                                     @RequestParam("scope") String scope,
+                                     @RequestParam(value = "imgs", required = false) List<MultipartFile> imgs,
+                                     @PathVariable("postId") Long requestPid,
+                                     Authentication authentication) throws IOException {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        PostDto postDto = new PostDto();
+        postDto.setId(requestPid);
+        postDto.setTitle(title);
+        postDto.setContent(content);
+        postDto.setLatitude(latitude);
+        postDto.setLongitude(longitude);
+        postDto.setUid(principalDetails.getUser().getId());
+        if("private".equals(scope)){
+            postDto.setScope(PostScope.PRIVATE);
+        } else if("public".equals(scope)) {
+            postDto.setScope(PostScope.PUBLIC);
+        } else {
+            postDto.setScope(PostScope.FRIENDS);
+        }
         Long pid = postService.modifyPost(postDto, imgs);
         return ResponseEntity.status(HttpStatus.CREATED).body(pid);
     }

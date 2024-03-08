@@ -173,7 +173,7 @@ public class Post extends TimeEntity {
 
                 HttpClient httpClient = HttpClientBuilder.create().build();
                 //ACL 권한을 public-read로 설정.
-                HttpPost request = new HttpPost(ENDPOINT + "/" + NcpObjectStorageConfig.ProfileImgBucketName + "/?delete= ");
+                HttpPost request = new HttpPost(ENDPOINT + "/" + NcpObjectStorageConfig.ProfileImgBucketName + "?delete=");
                 request.addHeader("Host", request.getURI().getHost());
 
                 try {
