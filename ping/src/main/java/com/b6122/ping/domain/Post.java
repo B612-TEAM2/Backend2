@@ -9,16 +9,24 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
@@ -32,12 +40,12 @@ import java.util.*;
 @Getter @Setter
 @Table(name = "post")
 @NoArgsConstructor
-public class Post extends TimeEntity{
+public class Post extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
-    private Long id ; //post id
+    private Long id; //post id
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -47,7 +55,7 @@ public class Post extends TimeEntity{
     private String location; //위치
 
     @Column
-    private float  latitude; //위도
+    private float latitude; //위도
 
     @Column
     private float longitude; //경도
@@ -75,7 +83,6 @@ public class Post extends TimeEntity{
         this.user = user;
         user.addPost(this); //user의 posts list에 post(this) 추가
     }
-
 
 
     @Transient
@@ -124,12 +131,112 @@ public class Post extends TimeEntity{
             String bucketName = NcpObjectStorageConfig.PostImgBucketName;
             try {
                 putObject(bucketName, objectName, imgs.get(i));
-                this.postImgObjectsName.add(objectName);
+                this.postImgObjectsName.set(i, objectName); //update ImgName
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+
+    private String generateXML(List<String> imgsName) throws IOException {
+        try {
+            // XML 문서 생성을 위한 객체 생성
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.newDocument();
+
+            // 최상위 요소 생성
+            Element deleteElement = document.createElement("Delete");
+            document.appendChild(deleteElement);
+
+            // 이미지 이름들을 반복하여 XML에 넣기
+            for (String key : imgsName) {
+                Element objectElement = document.createElement("Object");
+                Element keyElement = document.createElement("Key");
+                keyElement.appendChild(document.createTextNode(key));
+                objectElement.appendChild(keyElement);
+                deleteElement.appendChild(objectElement);
+            }
+
+            // XML 문서를 문자열로 변환하여 반환
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+            return stringWriter.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        public void deletePostImgObjectsInStorage(List<String> imgsName) throws IOException {
+
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                //ACL 권한을 public-read로 설정.
+                HttpPost request = new HttpPost(ENDPOINT + "/" + NcpObjectStorageConfig.ProfileImgBucketName + "/?delete= ");
+                request.addHeader("Host", request.getURI().getHost());
+
+                try {
+                    authorization(request, REGION_NAME, ACCESS_KEY, SECRET_KEY);
+                } catch (Exception e) {
+
+                }
+
+                try {
+                    // MD5 해시 함수 생성
+                    MessageDigest md = MessageDigest.getInstance("MD5");
+                    md.update(content.getBytes());
+
+                    // MD5 해시 값 얻기
+                    byte[] digest = md.digest();
+
+                    // Base64로 인코딩
+                    String base64Encoded = Base64.getEncoder().encodeToString(digest);
+                    request.addHeader("Content-MD5", base64Encoded);
+                    // 출력
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    // 현재 날짜 및 시간 얻기
+                    Date currentDate = new Date();
+
+                    // 날짜 및 시간 형식 지정
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // 시간대 설정
+
+                    // x-amz-date 생성
+                    String xAmzDate = dateFormat.format(currentDate);
+
+                    request.addHeader("x-amz-date", xAmzDate);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+                    // SHA-256 해시 함수 생성
+                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                    byte[] hash = digest.digest(content.getBytes("UTF-8"));
+
+                    // Base64로 인코딩
+                    String xAmzContentSha256 = Base64.getEncoder().encodeToString(hash);
+
+                    // 출력
+                    request.addHeader("x-amz-content-sha256", xAmzContentSha256);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // XML 내용을 StringEntity에 설정합니다.
+                StringEntity entity = new StringEntity(generateXML(imgsName), ContentType.create("text/plain", "UTF-8"));
+                request.setEntity(entity);
+
+                HttpResponse response = httpClient.execute(request);
+                System.out.println("Response : " + response.getStatusLine());
+            }
 
 
     //대표사진만 반환
@@ -145,6 +252,7 @@ public class Post extends TimeEntity{
         }
         return imgBytes;
     }
+
 
     //모든 사진 반환
     public List<byte[]> getPostImgObjectsBytes(List<String> postImgObjectsName) {

@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Getter@Setter
@@ -55,14 +56,14 @@ public class PostController {
     //글 수정 후 디비 저장
     @PostMapping("/posts/home/edit")
     public ResponseEntity modifyPost(@RequestBody @Validated PostDto postDto,
-                                     @RequestParam(value = "img", required = false) List<MultipartFile> imgs){
+                                     @RequestParam(value = "img", required = false) List<MultipartFile> imgs) throws IOException {
         Long pid = postService.modifyPost(postDto, imgs);
         return ResponseEntity.status(HttpStatus.CREATED).body(pid);
     }
 
     //글 삭제
     @PostMapping("/post/delete")
-        public ResponseEntity deletepost(@RequestParam("pid") Long pid){
+        public ResponseEntity deletepost(@RequestParam("pid") Long pid) throws IOException {
         postService.deletePost(pid);
         return ResponseEntity.ok(pid);
     }

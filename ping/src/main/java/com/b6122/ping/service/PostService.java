@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class PostService {
 
     //post 수정
     @Transactional
-    public Long modifyPost(PostDto postDto,List<MultipartFile> imgs) {
+    public Long modifyPost(PostDto postDto,List<MultipartFile> imgs) throws IOException {
 
         Post post = postRepository.findById(postDto.getId());
         post.setId(postDto.getId());
@@ -59,14 +60,17 @@ public class PostService {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setScope(postDto.getScope());
-        //수정 전 이미지 파일을 삭제하는코드 추가해야함
+        //수정 전 이미지 파일을 Ncp Object Storage에서 삭제
+        post.deletePostImgObjectsInStorage(post.getPostImgObjectsName());
         post.setPostImgObjectsName(imgs);
         return post.getId();
     }
 
 
     //글 삭제
-    public void deletePost(Long pid) {
+    public void deletePost(Long pid) throws IOException {
+        Post post = postRepository.findById(pid);
+        post.deletePostImgObjectsInStorage(post.getPostImgObjectsName());
         postRepository.deletePost(pid);
     }
 

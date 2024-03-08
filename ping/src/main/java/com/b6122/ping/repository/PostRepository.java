@@ -25,6 +25,14 @@ public class PostRepository {
         return null;
     }
 
+
+    public List<String> getPostImgsName(Long pid){
+        return (List<String>) em.createQuery("Select postImgObjectsName From Post p Where p.pid =:pid", Post.class)
+                .setParameter("pid", pid)
+                .getSingleResult();
+    }
+
+
     @Query("Delete FROM Post p WHERE p.pid = :pid")
     public List<Post> deletePost(@Param("pid") Long pid) {
         return null;
