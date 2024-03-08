@@ -83,10 +83,10 @@ public class PostDto {
         postDto.setScope(post.getScope());
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        if(!(post.getPostImgObjectsName().isEmpty())) {
+        if(post.getPostImgObjectsName() != null) {
             postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
         }
-        if(!(post.getUser().getProfileImgObjectName().isEmpty())) {
+        if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         }
         postDto.setUserNickname(post.getUser().getNickname());
@@ -104,10 +104,10 @@ public class PostDto {
         postDto.setMyLike(likeRepository.checkMyLike(post.getId(), post.getUser().getId()));//사용자가 post에 좋아요 눌렀다면 myLike == True
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
-        if(!(post.getPostImgObjectsName().isEmpty())) {
+        if(post.getPostImgObjectsName() != null) {
             postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
         }
-        if(!(post.getUser().getProfileImgObjectName().isEmpty())) {
+        if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         }
         postDto.setUserNickname(post.getUser().getNickname());
@@ -127,10 +127,10 @@ public class PostDto {
         postDto.setCreatedDate(post.getCreatedDate());
         postDto.setCreatedDate(post.getModifiedDate());
         postDto.setContent(post.getContent());
-        if(!(post.getPostImgObjectsName().isEmpty())) {
+        if(post.getPostImgObjectsName() != null) {
             postDto.setImgsByte(post.getPostImgObjectsBytes(post.getPostImgObjectsName())); //모든 이미지 가져오기
         }
-        if(!(post.getUser().getProfileImgObjectName().isEmpty())) {
+        if(post.getUser().getProfileImgObjectName() != null) {
             postDto.setUserImg(post.getUser().getProfileObjectImgBytes());
         }
         postDto.setUserNickname(post.getUser().getNickname());
