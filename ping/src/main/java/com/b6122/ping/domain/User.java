@@ -118,7 +118,7 @@ public class User {
             }
 
             //기존에 업로드된 이미지가 있다면 삭제
-            if(!(this.profileImgObjectName.isEmpty())) {
+            if(this.profileImgObjectName != null) {
                 try {
                     deleteObject(bucketName, this.profileImgObjectName);
                 } catch(IOException e) {
