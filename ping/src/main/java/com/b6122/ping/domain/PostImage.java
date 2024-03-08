@@ -8,7 +8,7 @@ import lombok.Getter;
 public class PostImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

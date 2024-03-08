@@ -75,9 +75,6 @@ public class Post extends TimeEntity {
     @OneToMany(mappedBy = "post")
     private List<Like> likes = new ArrayList<>();
 
-    //NCP Object Storage에 저장되는 파일 이름
-    private List<String> postImgObjectsName = new ArrayList<>();
-
     //연관관계 매서드//
     public void setUser(User user) {
         this.user = user;
