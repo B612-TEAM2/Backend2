@@ -45,6 +45,8 @@ public class PostService {
         post.setLikeCount(postDto.getLikeCount());
         post.setLikes(postDto.getLikes());
         if (imgs != null) {
+            System.out.println("createPost imgs = " + imgs);
+            System.out.println("createPost imgs = " + imgs);
             post.setPostImgObjectsName(imgs);
         }
         return postRepository.save(post);

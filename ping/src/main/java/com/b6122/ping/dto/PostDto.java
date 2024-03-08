@@ -40,9 +40,9 @@ public class PostDto {
 
     private boolean myLike; //본인이 글에 좋아요 눌렀는지
 
-    private LocalDateTime createdDate; //생성 날짜
+    private String createdDate; //생성 날짜
 
-    private LocalDateTime modifiedDate; //수정 날짜
+    private String modifiedDate; //수정 날짜
 
     private String contentPreview; //미리보기 15자
 
@@ -81,7 +81,7 @@ public class PostDto {
         postDto.setId(post.getId());
         postDto.setTitle(post.getTitle());
         postDto.setScope(post.getScope());
-        postDto.setCreatedDate(post.getCreatedDate());
+        postDto.setCreatedDate(post.getCreatedDate().toString());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
         if(post.getPostImgObjectsName() != null) {
             postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
@@ -102,7 +102,7 @@ public class PostDto {
         postDto.setScope(post.getScope());
         postDto.setLikeCount(post.getLikeCount());
         postDto.setMyLike(likeRepository.checkMyLike(post.getId(), post.getUser().getId()));//사용자가 post에 좋아요 눌렀다면 myLike == True
-        postDto.setCreatedDate(post.getCreatedDate());
+        postDto.setCreatedDate(post.getCreatedDate().toString());
         postDto.setContentPreview(truncateContent(post.getContent(), 15)); // Adjust for content preview
         if(post.getPostImgObjectsName() != null) {
             postDto.setImgByte(post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0))); //대표 이미지 가져오기
@@ -124,8 +124,8 @@ public class PostDto {
         postDto.setScope(post.getScope());
         postDto.setLikeCount(post.getLikeCount());
         postDto.setMyLike(likeRepository.checkMyLike(post.getId(), post.getUser().getId()));//사용자가 post에 좋아요 눌렀다면 myLike == True
-        postDto.setCreatedDate(post.getCreatedDate());
-        postDto.setCreatedDate(post.getModifiedDate());
+        postDto.setCreatedDate(post.getCreatedDate().toString());
+        postDto.setModifiedDate(post.getModifiedDate().toString());
         postDto.setContent(post.getContent());
         if(post.getPostImgObjectsName() != null) {
             postDto.setImgsByte(post.getPostImgObjectsBytes(post.getPostImgObjectsName())); //모든 이미지 가져오기

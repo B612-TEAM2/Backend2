@@ -76,7 +76,7 @@ public class Post extends TimeEntity {
     private List<Like> likes = new ArrayList<>();
 
     //NCP Object Storage에 저장되는 파일 이름
-    private List<String> postImgObjectsName;
+    private List<String> postImgObjectsName = new ArrayList<>();
 
     //연관관계 매서드//
     public void setUser(User user) {
@@ -125,13 +125,12 @@ public class Post extends TimeEntity {
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyyMMdd\'T\'HHmmss\'Z\'");
 
     public void setPostImgObjectsName(List<MultipartFile> imgs) {
-        List<String> objectsName = new ArrayList<String>();
         for (int i = 0; i < imgs.size(); i++) {
             String objectName = UUID.randomUUID() + "_" + imgs.get(i).getOriginalFilename();
             String bucketName = NcpObjectStorageConfig.PostImgBucketName;
             try {
                 putObject(bucketName, objectName, imgs.get(i));
-                this.postImgObjectsName.set(i, objectName); //update ImgName
+                this.postImgObjectsName.add(objectName); //update ImgName
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -306,13 +305,14 @@ public class Post extends TimeEntity {
 
         //MultipartFile을 전송하기 위해 File로 변환 (MultipartFile -> File)
         //운영체제의 임시 폴더에 저장
+        System.out.println("imgFile = " + imgFile);
+        System.out.println("imgFile = " + imgFile);
         File file = new File(System.getProperty("java.io.tmpdir")+"/"+objectName);
         file.createNewFile();
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(imgFile.getBytes());
         fileOutputStream.close();
 
-        //ACL 권한을 public-read로 설정.
         HttpPut request = new HttpPut(ENDPOINT + "/" + bucketName + "/" + objectName);
         request.addHeader("Host", request.getURI().getHost());
         request.setEntity(new FileEntity(file));

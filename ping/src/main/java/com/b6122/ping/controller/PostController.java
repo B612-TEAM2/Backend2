@@ -32,7 +32,7 @@ public class PostController {
                                         @RequestParam("latitude") float latitude,
                                         @RequestParam("longitude") float longitude,
                                         @RequestParam("scope") String scope,
-                                        @RequestParam(value = "img", required = false) List<MultipartFile> imgs,
+                                        @RequestParam(value = "imgs", required = false) List<MultipartFile> imgs,
                                         Authentication authentication){
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
