@@ -142,11 +142,12 @@ public class User {
         String objectName = this.getProfileImgObjectName();
         String bucketName = NcpObjectStorageConfig.ProfileImgBucketName;
         byte[] imgBytes = new byte[0];
-        try {
-            return imgBytes = getObject(bucketName, objectName);
+        if(this.profileImgObjectName != null) {
+            try {
+                return imgBytes = getObject(bucketName, objectName);
+            } catch (Exception e) {
 
-        } catch (Exception e) {
-
+            }
         }
         return imgBytes;
     }
