@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Getter@Setter
 @RestController
@@ -84,8 +85,9 @@ public class PostController {
 
     //글 삭제
     @DeleteMapping("/post/delete")
-        public ResponseEntity deletepost(@RequestParam("pid") Long pid) throws IOException {
-        postService.deletePost(pid);
+        public ResponseEntity deletepost(@RequestBody Map<String, Object> request) throws IOException {
+        Integer pid = (Integer) request.get("pid");
+        postService.deletePost(pid.longValue());
         return ResponseEntity.ok(pid);
     }
 

@@ -1,8 +1,6 @@
 package com.b6122.ping.domain;
 
-import com.b6122.ping.ImgPathProperties;
 import com.b6122.ping.NcpObjectStorageConfig;
-import com.b6122.ping.dto.UpdateUserProfileDto;
 import com.b6122.ping.dto.UserProfileReqDto;
 import com.b6122.ping.dto.UserProfileResDto;
 import jakarta.persistence.*;
@@ -17,15 +15,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,14 +54,17 @@ public class User {
     private UserRole role; // ROLE_USER or ROLE_ADMIN
 
     @OneToMany(mappedBy = "user", cascade =  CascadeType.REMOVE)
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
     //사용자가 fromUser인 Friendship 엔티티 리스트
     @OneToMany(mappedBy = "fromUser", cascade =  CascadeType.REMOVE)
+    @Builder.Default
     private List<Friendship> fromUserFriendships = new ArrayList<>();
 
     //사용자가 toUser인 Friendship 엔티티 리스트
     @OneToMany(mappedBy = "toUser", cascade =  CascadeType.REMOVE)
+    @Builder.Default
     private List<Friendship> toUserFriendships = new ArrayList<>();
 
     public void addFromUserFriendships(Friendship friendship) {
@@ -118,7 +116,7 @@ public class User {
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyyMMdd\'T\'HHmmss\'Z\'");
 
     public void addPost(Post p) {//외부에서 post 생성시 posts list에 추가
-        this.posts.add(p);
+        posts.add(p);
     }
 
     public void updateProfile(UserProfileReqDto reqDto) {

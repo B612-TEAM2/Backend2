@@ -21,7 +21,7 @@ public class PostImage {
         PostImage postImage = new PostImage();
         postImage.post = post;
         postImage.postImageName = imageName;
-
+        post.addImages(postImage);
         return postImage;
     }
 

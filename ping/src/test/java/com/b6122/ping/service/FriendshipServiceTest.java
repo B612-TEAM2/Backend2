@@ -1,21 +1,17 @@
 package com.b6122.ping.service;
 
-import com.b6122.ping.domain.Post;
+import com.b6122.ping.domain.Friendship;
 import com.b6122.ping.domain.User;
 import com.b6122.ping.domain.UserRole;
+import com.b6122.ping.repository.datajpa.FriendshipDataRepository;
 import com.b6122.ping.repository.datajpa.PostDataRepository;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class FriendshipServiceTest {
@@ -26,36 +22,69 @@ class FriendshipServiceTest {
     @Autowired
     PostDataRepository postDataRepository;
 
+    @Autowired
+    FriendshipService friendshipService;
+
+    @Autowired
+    FriendshipDataRepository friendshipDataRepository;
+
     @Test
     @DisplayName("친구추가")
     @Transactional
     void 친구추가() {
+        // given
         User user1 = User.builder()
                 .username("user1")
                 .nickname("user1Nickname")
+
+                .role(UserRole.ROLE_USER)
+                .build();
+        User user2 = User.builder()
+                .username("user2")
+                .nickname("user2Nickname")
                 .role(UserRole.ROLE_USER)
                 .build();
 
-        Long userId = userDataRepository.save(user1).getId();
+        userDataRepository.save(user1);
+        userDataRepository.save(user2);
 
-        Post post1 = new Post();
-        postDataRepository.save(post1);
+        //when
+        Friendship friendship = Friendship.createFriendship(user1, user2);
+        friendshipDataRepository.save(friendship);
 
-        post1.setUser(user1);
-        Assertions.assertEquals(user1.getPosts().size(),1);
-        Post post2 = new Post();
-        postDataRepository.save(post2);
+        Assertions.assertEquals(user1.getFromUserFriendships().size(),1);
+        Assertions.assertEquals(user1.getToUserFriendships().size(),0);
+        Assertions.assertEquals(user2.getToUserFriendships().size(),1);
+        Assertions.assertEquals(user2.getFromUserFriendships().size(),0);
+    }
 
-        post2.setUser(user1);
+    @Test
+    @DisplayName("친구삭제시캐스케이드테스트")
+    @Transactional
+    void 친구삭제시캐스케이드테스트() {
+        // given
+        User user1 = User.builder()
+                .username("user1")
+                .nickname("user1Nickname")
 
-        postDataRepository.save(post1);
-        postDataRepository.save(post2);
+                .role(UserRole.ROLE_USER)
+                .build();
+        User user2 = User.builder()
+                .username("user2")
+                .nickname("user2Nickname")
+                .role(UserRole.ROLE_USER)
+                .build();
 
-        Optional<User> findUser = userDataRepository.findById(userId);
-        Assertions.assertEquals(findUser.get().getPosts().size(), 2);
+        userDataRepository.save(user1);
+        userDataRepository.save(user2);
 
-        userDataRepository.delete(findUser.get());
-        Assertions.assertEquals(postDataRepository.findAll().size(), 0);
+        Friendship friendship = Friendship.createFriendship(user1, user2);
+        friendshipDataRepository.save(friendship);
 
+        //when
+        userDataRepository.delete(user1);
+
+        //then
+        Assertions.assertEquals(friendshipDataRepository.findFriendshipsById(friendship.getId()).size(),0);
     }
 }
