@@ -2,8 +2,7 @@ package com.b6122.ping.service;
 
 import com.b6122.ping.domain.User;
 import com.b6122.ping.domain.UserRole;
-import com.b6122.ping.dto.LoginResDto;
-import com.b6122.ping.dto.UserDto;
+import com.b6122.ping.dto.OauthLoginUserDto;
 import com.b6122.ping.oauth.provider.GoogleUser;
 import com.b6122.ping.oauth.provider.KakaoUser;
 import com.b6122.ping.oauth.provider.OAuthProperties;
@@ -29,7 +28,7 @@ public class OauthService {
     private final UserDataRepository userDataRepository;
 
     //회원 가입 후 jwt 토큰 발급
-    public LoginResDto join(String server, String code) throws IOException {
+    public OauthLoginUserDto join(String server, String code) throws IOException {
 
         Map<String, Object> userInfo = new HashMap<>();
         if ("kakao".equals(server)) {
@@ -229,7 +228,7 @@ public class OauthService {
      * @throws IOException
      */
     @Transactional
-    public LoginResDto joinOAuthUser(Map<String, Object> userInfoMap) throws IOException {
+    public OauthLoginUserDto joinOAuthUser(Map<String, Object> userInfoMap) throws IOException {
 
         //OAuthUser 생성을 위한 매핑
         String provider = userInfoMap.get("provider").toString();
@@ -262,7 +261,7 @@ public class OauthService {
                     // 회원가입
                     return userDataRepository.save(user);
                 });
-        return new LoginResDto(findUser.getId(), findUser.getUsername(), wasMember);
+        return new OauthLoginUserDto(findUser.getId(), findUser.getUsername(), wasMember);
 
     }
 
