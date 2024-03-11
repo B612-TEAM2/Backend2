@@ -2,10 +2,12 @@ package com.b6122.ping.dto;
 
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 public class PostPreviewMapDto {
     private Long id;
     private String title;

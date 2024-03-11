@@ -1,9 +1,12 @@
 package com.b6122.ping.dto;
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
+import lombok.Data;
+
 import java.util.List;
 
 // postPreviewList 대신
+@Data
 public class PostPreviewListDto {
     private Long id; //post id
     private String title; // 제목

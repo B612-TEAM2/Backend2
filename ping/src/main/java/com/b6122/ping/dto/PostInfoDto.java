@@ -2,8 +2,11 @@ package com.b6122.ping.dto;
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
 import com.b6122.ping.repository.LikeRepository;
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class PostInfoDto {
     private  Long id; //post id
 
