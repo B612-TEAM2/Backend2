@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 @AllArgsConstructor
-public class LoginResDto {
+public class OauthLoginUserDto {
     private Long id;
     private String username;
     AtomicBoolean wasMember;
