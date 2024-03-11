@@ -47,7 +47,7 @@ public class Post extends TimeEntity {
     @Column(name = "post_id")
     private Long id; //post id
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user; //사용자
 
