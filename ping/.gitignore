@@ -38,3 +38,4 @@ NcpObjectStorageConfig.java
 frontend/
 ### VS Code ###
 .vscode/
+/src/test/

@@ -5,6 +5,7 @@ import com.b6122.ping.domain.User;
 import com.b6122.ping.dto.*;
 import com.b6122.ping.repository.LikeRepository;
 import com.b6122.ping.repository.PostRepository;
+import com.b6122.ping.repository.datajpa.PostDataRepository;
 import com.b6122.ping.repository.datajpa.PostImageDataRepository;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final UserDataRepository userDataRepository;
     private final PostImageDataRepository postImageDataRepository;
+    private final PostDataRepository postDataRepository;
 
     @Transactional
     public Long createPost(PostDto postDto, List<MultipartFile> imgs) {
@@ -85,6 +87,7 @@ public class PostService {
 
 
     //글 삭제
+    @Transactional
     public void deletePost(Long pid) throws IOException {
         Post post = postRepository.findById(pid);
         List<PostImage> postImageEntities = postImageDataRepository.findByPostId(post.getId());
@@ -93,7 +96,7 @@ public class PostService {
             postImageNames.add(postImageEntity.getPostImageName());
         }
         post.deletePostImgObjectsInStorage(postImageNames);
-        postRepository.deletePost(pid);
+        postDataRepository.deleteById(pid);
     }
 
 

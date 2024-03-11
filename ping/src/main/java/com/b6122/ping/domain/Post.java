@@ -75,12 +75,18 @@ public class Post extends TimeEntity {
     @OneToMany(mappedBy = "post")
     private List<Like> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostImage> postImages = new ArrayList<>();
+
     //연관관계 매서드//
     public void setUser(User user) {
         this.user = user;
         user.addPost(this); //user의 posts list에 post(this) 추가
     }
 
+    public void addImages(PostImage postImage) {
+        this.postImages.add(postImage);
+    }
 
     @Transient
     private final String REGION_NAME = "kr-standard";

@@ -24,11 +24,11 @@ public class PostRepository {
     public List<Post> findByLocationUser(@Param("latitude") float latitude, @Param("longitude") float longitude, @Param("uid") long uid) {
         return null;
     }
-
-    @Query("Delete FROM Post p WHERE p.id = :pid")
-    public List<Post> deletePost(@Param("pid") Long pid) {
-        return null;
-    }
+//
+//    @Query("Delete FROM Post p WHERE p.id = :pid")
+//    public List<Post> deletePost(@Param("pid") Long pid) {
+//        return null;
+//    }
 
     @Modifying// 조회수 중복 방지 추가 구현
     @Query("update Post p set p.viewCount = :viewCount where p.id =:id")
