@@ -58,8 +58,24 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role; // ROLE_USER or ROLE_ADMIN
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade =  CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
+
+    //사용자가 fromUser인 Friendship 엔티티 리스트
+    @OneToMany(mappedBy = "fromUser", cascade =  CascadeType.REMOVE)
+    private List<Friendship> fromUserFriendships = new ArrayList<>();
+
+    //사용자가 toUser인 Friendship 엔티티 리스트
+    @OneToMany(mappedBy = "toUser", cascade =  CascadeType.REMOVE)
+    private List<Friendship> toUserFriendships = new ArrayList<>();
+
+    public void addFromUserFriendships(Friendship friendship) {
+        this.fromUserFriendships.add(friendship);
+    }
+
+    public void addToUserFriendships(Friendship friendship) {
+        this.toUserFriendships.add(friendship);
+    }
 
     /** NCP API 요청에 필요한 값들 **/
     @Transient

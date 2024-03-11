@@ -83,7 +83,7 @@ public class PostController {
     }
 
     //글 삭제
-    @PostMapping("/post/delete")
+    @DeleteMapping("/post/delete")
         public ResponseEntity deletepost(@RequestParam("pid") Long pid) throws IOException {
         postService.deletePost(pid);
         return ResponseEntity.ok(pid);

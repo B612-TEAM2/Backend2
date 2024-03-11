@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,11 +18,11 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_user_id")
     private User fromUser; //친구 요청을 보낸 User
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id")
     private User toUser; //친구 요청을 받은 User
 
@@ -35,6 +37,8 @@ public class Friendship {
         friendship.fromUser = fromUser;
         friendship.toUser = toUser;
         friendship.requestStatus = FriendshipRequestStatus.PENDING;
+        fromUser.addFromUserFriendships(friendship);
+        toUser.addToUserFriendships(friendship);
         return friendship;
     }
 
@@ -60,11 +64,35 @@ public class Friendship {
      * @param reqDto String nickname, String status, Long toUserId;
      */
     public void updateFriendship(AddFriendReqDto reqDto) {
+        List<Friendship> fromUserFriendships= this.getFromUser().getFromUserFriendships();
+        List<Friendship> toUserFriendships = this.getToUser().getToUserFriendships();
         if ("accept".equals(reqDto.getStatus())) {
             this.requestStatus = FriendshipRequestStatus.ACCEPTED;
             this.isFriend = true;
+            for (Friendship fromUserFriendship : fromUserFriendships) {
+                if(fromUserFriendship.equals(this)) {
+                    fromUserFriendship.isFriend = true;
+                    fromUserFriendship.requestStatus = FriendshipRequestStatus.ACCEPTED;
+                }
+            }
+            for (Friendship toUserFriendship : toUserFriendships) {
+                if(toUserFriendship.equals(this)) {
+                    toUserFriendship.isFriend = true;
+                    toUserFriendship.requestStatus = FriendshipRequestStatus.ACCEPTED;
+                }
+            }
         } else {
             this.requestStatus = FriendshipRequestStatus.REJECTED;
+            for (Friendship fromUserFriendship : fromUserFriendships) {
+                if(fromUserFriendship.equals(this)) {
+                    fromUserFriendship.requestStatus = FriendshipRequestStatus.REJECTED;
+                }
+            }
+            for (Friendship toUserFriendship : toUserFriendships) {
+                if(toUserFriendship.equals(this)) {
+                    toUserFriendship.requestStatus = FriendshipRequestStatus.REJECTED;
+                }
+            }
         }
 
     }
