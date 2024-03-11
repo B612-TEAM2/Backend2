@@ -88,8 +88,20 @@ public class PostService {
         return PostDto.postInfo(post, likeRepository);
     }
 
+    public void toggleLike(Long pid, Long uid, Boolean isLike){
+        if(!isLike){ //좋아요 취소
+            likeRepository.delete(pid, uid);
+            postRepository.downLikeCount(pid);
+        }
+
+        else{
+            likeRepository.save(pid, uid);
+            postRepository.upLikeCount(pid);
+        }
+    }
     //for문 마다 확인하기엔 통신이 너무 오래 걸림, db에서 한번에 검사하는게 효율적
     //postid, MyLike 받아서 체크
+    /*
     public void toggleLike(List<Long> pids, List<Boolean> myLikes, Long uid) {
         List<Long> delLikePids = new ArrayList<>();
         List<Long> insertLikePids = new ArrayList<>();
@@ -103,7 +115,7 @@ public class PostService {
         likeRepository.delete(delLikePids, uid);
         likeRepository.save(insertLikePids, uid);
     }
-
+*/
     //pin 클릭시 해당 위치의 postList 반환,home friend public 동일한 함수 사용
     public List<PostDto> getPostsPreviewPin(List<Long> pids) {
         List<Post> posts = new ArrayList<>();

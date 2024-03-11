@@ -26,6 +26,28 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
     //글 작성 후 디비 저장
+    @PostMapping("/likeToggle")
+    public ResponseEntity clickLike(@RequestParam("pid") long pid,
+                                    @RequestParam("isLike") Boolean isLike,
+                                    Authentication authentication){
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long uid = principalDetails.getUser().getId();
+        postService.toggleLike(pid, uid, isLike);
+        return ResponseEntity.ok("pid");
+    }
+
+
+     /*
+     // 좋아요 토글 한 번에 여러개 처리
+    public ResponseEntity<String> toggleLike(@RequestParam List<Long> pids, @RequestParam List<Boolean> myLikes,Authentication authentication ) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long uid = principalDetails.getUser().getId();
+        postService.toggleLike(pids, myLikes, uid);
+
+        return ResponseEntity.ok("Like toggled successfully");
+    }
+    */
+
     @PostMapping("/posts/home/store")
     public ResponseEntity<Long> getPost(@RequestParam("title") String title,
                                         @RequestParam("content") String content,
@@ -76,17 +98,6 @@ public class PostController {
         PostDto pd = postService.getPostInfo(pid, uid);
         System.out.println("PostDto = " + pd);
         return ResponseEntity.ok(pd);
-    }
-
-    //좋아요 update
-    @PostMapping("/likeToggle")
-
-    public ResponseEntity<String> toggleLike(@RequestParam List<Long> pids, @RequestParam List<Boolean> myLikes,Authentication authentication ) {
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Long uid = principalDetails.getUser().getId();
-        postService.toggleLike(pids, myLikes, uid);
-
-        return ResponseEntity.ok("Like toggled successfully");
     }
 
 
@@ -157,5 +168,7 @@ public class PostController {
         List<PostDto> posts = postService.getPostsPublicList(longitude,latitude);
         return ResponseEntity.ok(posts);
     }
+
+
 }
 

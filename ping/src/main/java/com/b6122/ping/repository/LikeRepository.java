@@ -38,6 +38,22 @@ public class LikeRepository {
     }
 */
 
+    //like 정보를 한 번에 한 개씩 받는 경우
+    public void save(@Param("pid") Long pid,  @Param("uid") Long uid ) {
+            TypedQuery<Like> query = em.createQuery("Insert INTO Like l(pid, uid) VALUES (:pid, :uid)", Like.class);
+            query.setParameter("pid", pid);
+            query.setParameter("uid", uid);
+    }
+
+    public void delete(@Param("pid") Long pid, @Param("uid") Long uid ) {
+        TypedQuery<Like> query = em.createQuery("delete FROM Like l WHERE l.pid =:pid And l.uid = :uid", Like.class);
+        query.setParameter("pid", pid);
+        query.setParameter("uid", uid);
+    }
+
+
+    /*
+    //like 정보를 한 번에 여러개 받는 경우
     public void save(@Param("pids") List<Long> pids,  @Param("uid") Long uid ) {
         for(Long pid : pids){
             TypedQuery<Like> query = em.createQuery("Insert INTO Like l(pid, uid) VALUES (:pid, :uid)", Like.class);
@@ -52,6 +68,6 @@ public class LikeRepository {
         query.setParameter("pids", pids);
         query.setParameter("uid", uid);
     }
-
+*/
 
 }

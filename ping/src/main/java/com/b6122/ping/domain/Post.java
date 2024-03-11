@@ -76,6 +76,8 @@ public class Post extends TimeEntity {
     private List<Like> likes = new ArrayList<>();
 
     //NCP Object Storage에 저장되는 파일 이름
+
+    @Column
     private List<String> postImgObjectsName;
 
     //연관관계 매서드//
@@ -125,7 +127,6 @@ public class Post extends TimeEntity {
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyyMMdd\'T\'HHmmss\'Z\'");
 
     public void setPostImgObjectsName(List<MultipartFile> imgs) {
-        List<String> objectsName = new ArrayList<String>();
         for (int i = 0; i < imgs.size(); i++) {
             String objectName = UUID.randomUUID() + "_" + imgs.get(i).getOriginalFilename();
             String bucketName = NcpObjectStorageConfig.PostImgBucketName;
