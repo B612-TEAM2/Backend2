@@ -61,7 +61,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
-
+    /** NCP API 요청에 필요한 값들 **/
     @Transient
     private final String REGION_NAME = "kr-standard";
 
@@ -118,7 +118,7 @@ public class User {
             }
 
             //기존에 업로드된 이미지가 있다면 삭제
-            if(!(this.profileImgObjectName.isEmpty())) {
+            if(this.profileImgObjectName != null) {
                 try {
                     deleteObject(bucketName, this.profileImgObjectName);
                 } catch(IOException e) {
@@ -142,11 +142,12 @@ public class User {
         String objectName = this.getProfileImgObjectName();
         String bucketName = NcpObjectStorageConfig.ProfileImgBucketName;
         byte[] imgBytes = new byte[0];
-        try {
-            return imgBytes = getObject(bucketName, objectName);
+        if(this.profileImgObjectName != null) {
+            try {
+                return imgBytes = getObject(bucketName, objectName);
+            } catch (Exception e) {
 
-        } catch (Exception e) {
-
+            }
         }
         return imgBytes;
     }
@@ -164,9 +165,6 @@ public class User {
         System.out.println("Response : " + response.getStatusLine());
 
         InputStream is = response.getEntity().getContent();
-        //임시 폴더에 저장
-//        File targetFile = new File(System.getProperty("java.io.tmpdir")+"/"+objectName);
-//        OutputStream os = new FileOutputStream(targetFile);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[8 * 1024];
@@ -256,6 +254,9 @@ public class User {
         request.addHeader("Authorization", authorization);
     }
 
+    /**
+     * NCP API 요청시 필요한 Authorization 헤더 값 추출
+     */
     private String getAuthorization(String accessKey, String scope, String signedHeaders, String signature) {
         String signingCredentials = accessKey + "/" + scope;
         String credential = "Credential=" + signingCredentials;

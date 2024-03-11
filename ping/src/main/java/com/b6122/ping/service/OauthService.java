@@ -2,7 +2,7 @@ package com.b6122.ping.service;
 
 import com.b6122.ping.domain.User;
 import com.b6122.ping.domain.UserRole;
-import com.b6122.ping.dto.UserDto;
+import com.b6122.ping.dto.OauthLoginUserDto;
 import com.b6122.ping.oauth.provider.GoogleUser;
 import com.b6122.ping.oauth.provider.KakaoUser;
 import com.b6122.ping.oauth.provider.OAuthProperties;
@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class OauthService {
     private final UserDataRepository userDataRepository;
 
     //회원 가입 후 jwt 토큰 발급
-    public UserDto join(String server, String code) throws IOException {
+    public OauthLoginUserDto join(String server, String code) throws IOException {
 
         Map<String, Object> userInfo = new HashMap<>();
         if ("kakao".equals(server)) {
@@ -227,7 +228,7 @@ public class OauthService {
      * @throws IOException
      */
     @Transactional
-    public UserDto joinOAuthUser(Map<String, Object> userInfoMap) throws IOException {
+    public OauthLoginUserDto joinOAuthUser(Map<String, Object> userInfoMap) throws IOException {
 
         //OAuthUser 생성을 위한 매핑
         String provider = userInfoMap.get("provider").toString();
@@ -243,6 +244,9 @@ public class OauthService {
         //OAuthUser 생성 -> 나중에 프로바이더마다 다른 회원가입 정책을 할 수도 있기 때문에 추상화
         OAuthUser oAuthUser = createOAuthUser(provider, userInfo);
 
+        //프론트에 회원 여부 전달 하기 위한 변수
+        AtomicBoolean wasMember = new AtomicBoolean(true);
+
         //db에 회원 등록이 되어있는지 확인후, 안되어 있다면 회원가입 시도
         User findUser = userDataRepository
                 .findByUsername(oAuthUser.getName())
@@ -253,11 +257,11 @@ public class OauthService {
                             .username(oAuthUser.getName())
                             .role(UserRole.ROLE_USER)
                             .build();
-
+                    wasMember.set(false);
                     // 회원가입
                     return userDataRepository.save(user);
                 });
-        return new UserDto(findUser.getId(), findUser.getUsername());
+        return new OauthLoginUserDto(findUser.getId(), findUser.getUsername(), wasMember);
 
     }
 
