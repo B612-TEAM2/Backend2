@@ -23,6 +23,7 @@ public class PostPreviewMapDto {
         this.title = post.getTitle();
         this.scope = post.getScope();
         this.contentPreview = truncateContent(post.getContent(), 15);
+        this.createdDate = post.getCreatedDate();
 
         if(!postImageNames.isEmpty()) {
             this.imgByte = post.getPostImgObjectBytes(postImageNames.get(0)); //대표 이미지 가져오기
