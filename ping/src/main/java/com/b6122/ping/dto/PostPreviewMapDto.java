@@ -16,16 +16,16 @@ public class PostPreviewMapDto {
     private String userNickname;
     private String contentPreview; //미리보기 15자
 
-    public PostPreviewMapDto(Post post){
+    public PostPreviewMapDto(Post post, List<String> postImageNames ){
         this.id = post.getId();
         this.title = post.getTitle();
         this.scope = post.getScope();
         this.contentPreview = truncateContent(post.getContent(), 15);
 
-        if(!(post.getPostImgObjectsName().isEmpty())) {
-            this.imgByte = post.getPostImgObjectBytes(post.getPostImgObjectsName().get(0)); //대표 이미지 가져오기
+        if(!postImageNames.isEmpty()) {
+            this.imgByte = post.getPostImgObjectBytes(postImageNames.get(0)); //대표 이미지 가져오기
         }
-        if(!(post.getUser().getProfileImgObjectName().isEmpty())) {
+        if(post.getUser().getProfileImgObjectName() != null){
             this.userImg = post.getUser().getProfileObjectImgBytes();
         }
         this.userNickname = post.getUser().getNickname();

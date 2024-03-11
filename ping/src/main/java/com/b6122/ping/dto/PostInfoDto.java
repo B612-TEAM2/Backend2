@@ -1,13 +1,7 @@
 package com.b6122.ping.dto;
-
-
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
 import com.b6122.ping.repository.LikeRepository;
-
-
-import java.time.LocalDateTime;
-
 import java.util.List;
 
 public class PostInfoDto {
@@ -25,9 +19,9 @@ public class PostInfoDto {
 
     private boolean myLike; //본인이 글에 좋아요 눌렀는지
 
-    private LocalDateTime createdDate; //생성 날짜
+    private String createdDate; //생성 날짜
 
-    private LocalDateTime modifiedDate; //수정 날짜
+    private String modifiedDate; //수정 날짜
 
 
     //프론트로 이미지 파일 전달
@@ -36,7 +30,7 @@ public class PostInfoDto {
 
     private String userNickname;
 
-    public PostInfoDto(Post post, LikeRepository likeRepository) {
+    public PostInfoDto(Post post, LikeRepository likeRepository, List<String> postImageNames) {
 
         this.id = post.getId();
         this.uid = post.getUser().getId();
@@ -44,13 +38,14 @@ public class PostInfoDto {
         this.scope = post.getScope();
         this.likeCount = post.getLikeCount();
         this.myLike = likeRepository.checkMyLike(post.getId(), post.getUser().getId());
-        this.createdDate = post.getCreatedDate();
-        this.modifiedDate = post.getModifiedDate();
+        this.createdDate = post.getCreatedDate().toString();
+        this.modifiedDate = post.getModifiedDate().toString();
         this.content = post.getContent();
-        if (!(post.getPostImgObjectsName().isEmpty())) {
-            this.imgsByte = post.getPostImgObjectsBytes(post.getPostImgObjectsName()); //모든 이미지 가져오기
+
+        if (!(postImageNames.isEmpty())) {
+            this.imgsByte = post.getPostImgObjectsBytes(postImageNames); //모든 이미지 가져오기
         }
-        if (!(post.getUser().getProfileImgObjectName().isEmpty())) {
+        if (post.getUser().getProfileImgObjectName() != null){
             this.userImg = post.getUser().getProfileObjectImgBytes();
         }
         this.userNickname = post.getUser().getNickname();
