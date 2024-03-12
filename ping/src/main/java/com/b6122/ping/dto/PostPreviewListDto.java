@@ -3,7 +3,6 @@ import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
 import com.b6122.ping.repository.LikeRepository;
 import lombok.Data;
-
 import java.util.List;
 
 // postPreviewList 대신

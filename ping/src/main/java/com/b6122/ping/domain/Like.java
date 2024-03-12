@@ -15,7 +15,7 @@ public class Like {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id") //좋아요를 누른 사람의 id
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
