@@ -102,10 +102,11 @@ public class PostController {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long uid = principalDetails.getUser().getId();
         Long pid = Long.valueOf(postId);
-        postService.toggleLike(pid, uid, isLike);
+        int updatedLikeCount = postService.toggleLike(pid, uid, isLike);
         Map<String, Object> map = new HashMap<>();
         map.put("pid", pid);
         map.put("isLike", isLike);
+        map.put("likeCount", updatedLikeCount);
         return ResponseEntity.ok().body(map);
     }
 
