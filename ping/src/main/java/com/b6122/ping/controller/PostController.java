@@ -165,7 +165,6 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-
     //친구 글 목록 preview 반환, 친구 id를 리스트로 받아 scope가 friend, public 인 것만 최신순으로 반환
     @GetMapping("/posts/friends/list")
     public ResponseEntity<List<PostPreviewListDto>> showPostsFriendsList(@RequestParam("uids") List<Long> uids) {
