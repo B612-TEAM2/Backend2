@@ -19,7 +19,7 @@ public class LikeRepository {
 
     //특정post에 좋아요를 눌렀는지 확인
     public boolean checkMyLike(Long pid, Long uid) {
-        TypedQuery<Like> query = em.createQuery("SELECT l FROM Like l WHERE l.post.id = :pid AND l.user.id = :uid", Like.class);
+        TypedQuery<Like> query = em.createQuery("SELECT l FROM Like l WHERE l.post_id = :pid AND l.user_id = :uid", Like.class);
         query.setParameter("pid", pid);
         query.setParameter("uid", uid);
 
@@ -40,13 +40,13 @@ public class LikeRepository {
 
     //like 정보를 한 번에 한 개씩 받는 경우
     public void save(@Param("pid") Long pid,  @Param("uid") Long uid ) {
-            TypedQuery<Like> query = em.createQuery("Insert INTO Like l(pid, uid) VALUES (:pid, :uid)", Like.class);
+            TypedQuery<Like> query = em.createQuery("Insert INTO Like l(post_id, user_id) VALUES (:pid, :uid)", Like.class);
             query.setParameter("pid", pid);
             query.setParameter("uid", uid);
     }
 
     public void delete(@Param("pid") Long pid, @Param("uid") Long uid ) {
-        TypedQuery<Like> query = em.createQuery("delete FROM Like l WHERE l.pid =:pid And l.uid = :uid", Like.class);
+        TypedQuery<Like> query = em.createQuery("delete FROM Like l WHERE l.post_id =:pid And l.user_id = :uid", Like.class);
         query.setParameter("pid", pid);
         query.setParameter("uid", uid);
     }
