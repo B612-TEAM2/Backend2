@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,13 +96,16 @@ public class PostController {
     }
 
     @PostMapping("/likeToggle")
-    public ResponseEntity clickLike(@RequestParam("pid") long pid,
+    public ResponseEntity<Map<String, Object>> clickLike(@RequestParam("pid") long pid,
                                     @RequestParam("isLike") Boolean isLike,
                                     Authentication authentication){
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long uid = principalDetails.getUser().getId();
         postService.toggleLike(pid, uid, isLike);
-        return ResponseEntity.ok("pid");
+        Map<String, Object> map = new HashMap<>();
+        map.put("pid", pid);
+        map.put("isLike", isLike);
+        return ResponseEntity.ok().body(map);
     }
 
 
