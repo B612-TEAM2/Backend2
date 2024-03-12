@@ -21,4 +21,11 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public static Like createOne(User user, Post post) {
+        Like like = new Like();
+        like.user = user;
+        like.post = post;
+        return like;
+    }
 }
