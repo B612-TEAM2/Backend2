@@ -1,10 +1,12 @@
 package com.b6122.ping.service;
+import com.b6122.ping.domain.Like;
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostImage;
 import com.b6122.ping.domain.User;
 import com.b6122.ping.dto.*;
 import com.b6122.ping.repository.LikeRepository;
 import com.b6122.ping.repository.PostRepository;
+import com.b6122.ping.repository.datajpa.LikeDataRepository;
 import com.b6122.ping.repository.datajpa.PostDataRepository;
 import com.b6122.ping.repository.datajpa.PostImageDataRepository;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
@@ -26,6 +28,7 @@ public class PostService {
     private final UserDataRepository userDataRepository;
     private final PostImageDataRepository postImageDataRepository;
     private final PostDataRepository postDataRepository;
+    private final LikeDataRepository likeDataRepository;
 
     @Transactional
     public Long createPost(PostDto postDto, List<MultipartFile> imgs) {
@@ -117,11 +120,20 @@ public class PostService {
 
     public void toggleLike(Long pid, Long uid, Boolean isLike){
         if(!isLike){ //좋아요 취소
-            likeRepository.delete(pid, uid);
+//            likeRepository.delete(pid, uid);
+            Post post = postDataRepository.findById(pid).orElseThrow(RuntimeException::new);
+            User user = userDataRepository.findById(uid).orElseThrow(RuntimeException::new);
+            Like like = Like.createOne(user, post);
+            likeDataRepository.delete(like);
             postRepository.downLikeCount(pid);
         }
         else{
-            likeRepository.save(pid, uid);
+            Post post = postDataRepository.findById(pid).orElseThrow(RuntimeException::new);
+            User user = userDataRepository.findById(uid).orElseThrow(RuntimeException::new);
+            Like like = Like.createOne(user, post);
+
+            likeDataRepository.save(like);
+//            likeRepository.save(pid, uid);
             postRepository.upLikeCount(pid);
         }
     }
@@ -190,13 +202,13 @@ public class PostService {
 
     //Public
     public List<PinDto> getPinsPublicMap ( float longitude, float latitude){
-        List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
+        List<Post> posts = postDataRepository.findPublicPosts(longitude, latitude);
         return getPinDtos(posts);
     }
 
 
     public List<PostPreviewListDto> getPostsPublicList ( float longitude, float latitude) {
-        List<Post> posts = postRepository.findPublicPosts(longitude, latitude);
+        List<Post> posts = postDataRepository.findPublicPosts(longitude, latitude);
         return getPostPreviewListDtos(posts);
     }
 

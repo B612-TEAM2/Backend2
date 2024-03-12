@@ -90,9 +90,14 @@ public class PostRepository {
     }
 
     public List<Post> findPublicPosts(float longitude, float latitude) {
-        return em.createQuery("select p from Post p"+
-                        " where p.scope = \"public\" and ST_Distance_Sphere(POINT(p.longitude, p.latitude), POINT(longitude, latitude)) <= 2000" +
-                        "order by p.createdDate", Post.class)
+        System.out.println("findPUblicPosts 진입");
+        System.out.println("findPUblicPosts 진입");
+        return em.createQuery("select p from Post p" +
+                        " where p.scope = com.b6122.ping.domain.PostScope.PUBLIC and ST_Distance_Sphere(POINT(p.longitude, p.latitude), POINT(:longitude, :latitude)) <= 2000" +
+                        " order by p.createdDate", Post.class)
+                .setParameter("longitude", longitude)
+                .setParameter("latitude", latitude)
                 .getResultList();
     }
+
 }

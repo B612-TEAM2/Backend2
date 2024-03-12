@@ -96,11 +96,12 @@ public class PostController {
     }
 
     @PostMapping("/likeToggle")
-    public ResponseEntity<Map<String, Object>> clickLike(@RequestParam("pid") long pid,
+    public ResponseEntity<Map<String, Object>> clickLike(@RequestParam("pid") String postId,
                                     @RequestParam("isLike") Boolean isLike,
                                     Authentication authentication){
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long uid = principalDetails.getUser().getId();
+        Long pid = Long.valueOf(postId);
         postService.toggleLike(pid, uid, isLike);
         Map<String, Object> map = new HashMap<>();
         map.put("pid", pid);
@@ -169,7 +170,6 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-
     //친구 글 목록 preview 반환, 친구 id를 리스트로 받아 scope가 friend, public 인 것만 최신순으로 반환
     @GetMapping("/posts/friends/list")
     public ResponseEntity<List<PostPreviewListDto>> showPostsFriendsList(@RequestParam("uids") List<Long> uids) {
@@ -195,7 +195,7 @@ public class PostController {
     @GetMapping("/posts/public/list")
     public ResponseEntity<List<PostPreviewListDto>> showPostsPubicList(@RequestParam("longitude") float longitude, @RequestParam("latitude") float latitude) {
         List<PostPreviewListDto> posts = postService.getPostsPublicList(longitude,latitude);
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok().body(posts);
     }
 
 

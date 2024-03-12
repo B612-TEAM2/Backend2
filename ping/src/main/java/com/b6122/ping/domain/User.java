@@ -140,9 +140,10 @@ public class User {
                 }
             }
         }
-
-        this.nickname = reqDto.getNickname();
         this.profileImgObjectName = objectName;
+        if (!(reqDto.getNickname().isEmpty())) {
+            this.nickname = reqDto.getNickname();
+        }
     }
 
     //회원 정보(nickname, profileImg, id)

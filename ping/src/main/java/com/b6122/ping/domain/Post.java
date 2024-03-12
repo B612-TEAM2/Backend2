@@ -72,7 +72,7 @@ public class Post extends TimeEntity {
     @ColumnDefault("0")
     @Column(name = "likeCount")
     private int likeCount; // 좋아요 수
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
