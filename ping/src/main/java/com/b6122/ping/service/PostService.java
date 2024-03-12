@@ -217,7 +217,7 @@ public class PostService {
             for (PostImage postImage : postImageEntities) {
                 postImageNames.add(postImage.getPostImageName());
             }
-            PostPreviewListDto postPreviewListDto = new PostPreviewListDto(post, postImageNames);
+            PostPreviewListDto postPreviewListDto = new PostPreviewListDto(post, likeRepository, postImageNames);
             postDtos.add(postPreviewListDto);
         }
         return postDtos;

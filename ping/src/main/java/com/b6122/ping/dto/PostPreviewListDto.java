@@ -1,6 +1,7 @@
 package com.b6122.ping.dto;
 import com.b6122.ping.domain.Post;
 import com.b6122.ping.domain.PostScope;
+import com.b6122.ping.repository.LikeRepository;
 import lombok.Data;
 
 import java.util.List;
@@ -13,17 +14,19 @@ public class PostPreviewListDto {
     private PostScope scope; //공개 범위 [private, friends, public]
     private String createdDate; //생성 날짜
     private String contentPreview; //미리보기 15자
+    private boolean myLike; //본인이 글에 좋아요 눌렀는지
 
     //프론트로 이미지 파일 전달
     private byte[] imgByte;
     private byte[] userImg;
     private String userNickname;
 
-    public PostPreviewListDto(Post post, List<String> postImageNames) {
+    public PostPreviewListDto(Post post, LikeRepository likeRepository, List<String> postImageNames) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.scope = post.getScope();
         this.createdDate = post.getCreatedDate().toString();
+        this.myLike = likeRepository.checkMyLike(post.getId(), post.getUser().getId());
         this.contentPreview = truncateContent(post.getContent(), 15); // Adjust for content preview
         if(!postImageNames.isEmpty()) {
             this.imgByte = post.getPostImgObjectBytes(postImageNames.get(0)); //대표 이미지 가져오기

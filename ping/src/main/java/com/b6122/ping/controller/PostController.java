@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,27 +28,6 @@ public class PostController {
     private final PostService postService;
 
 
-    @PostMapping("/likeToggle")
-    public ResponseEntity clickLike(@RequestParam("pid") long pid,
-                                    @RequestParam("isLike") Boolean isLike,
-                                    Authentication authentication){
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Long uid = principalDetails.getUser().getId();
-        postService.toggleLike(pid, uid, isLike);
-        return ResponseEntity.ok("pid");
-    }
-
-
-     /*
-     // 좋아요 토글 한 번에 여러개 처리
-    public ResponseEntity<String> toggleLike(@RequestParam List<Long> pids, @RequestParam List<Boolean> myLikes,Authentication authentication ) {
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Long uid = principalDetails.getUser().getId();
-        postService.toggleLike(pids, myLikes, uid);
-
-        return ResponseEntity.ok("Like toggled successfully");
-    }
-    */
 
     //글 작성 후 디비 저장
     @PostMapping("/posts/home/store")
@@ -116,6 +94,29 @@ public class PostController {
         return ResponseEntity.ok(pid);
     }
 
+    @PostMapping("/likeToggle")
+    public ResponseEntity clickLike(@RequestParam("pid") long pid,
+                                    @RequestParam("isLike") Boolean isLike,
+                                    Authentication authentication){
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long uid = principalDetails.getUser().getId();
+        postService.toggleLike(pid, uid, isLike);
+        return ResponseEntity.ok("pid");
+    }
+
+
+     /*
+     // 좋아요 토글 한 번에 여러개 처리
+    public ResponseEntity<String> toggleLike(@RequestParam List<Long> pids, @RequestParam List<Boolean> myLikes,Authentication authentication ) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Long uid = principalDetails.getUser().getId();
+        postService.toggleLike(pids, myLikes, uid);
+
+        return ResponseEntity.ok("Like toggled successfully");
+    }
+    */
+
+
     //글 정보 반환, 조회수 ++
     @GetMapping("/postInfo")
     public ResponseEntity<PostInfoDto> postInfo(@RequestParam("pid") Long pid,Authentication authentication ) {
@@ -153,8 +154,6 @@ public class PostController {
         List<PostPreviewListDto> posts = postService.getPostsHomeList(uid);
         return ResponseEntity.ok().body(posts);
     }
-
-
 
 
     //Friend
