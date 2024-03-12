@@ -1,7 +1,6 @@
 package com.b6122.ping.service;
 
 import com.b6122.ping.domain.User;
-import com.b6122.ping.dto.UpdateUserProfileDto;
 import com.b6122.ping.dto.UserProfileReqDto;
 import com.b6122.ping.dto.UserProfileResDto;
 import com.b6122.ping.repository.datajpa.UserDataRepository;
