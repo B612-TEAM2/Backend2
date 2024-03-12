@@ -118,24 +118,28 @@ public class PostService {
         return new PostInfoDto(post, likeRepository, postImageNames);
     }
 
-    public void toggleLike(Long pid, Long uid, Boolean isLike){
+    @Transactional
+    public int toggleLike(Long pid, Long uid, Boolean isLike){
+        int updateLikeCount;
+
         if(!isLike){ //좋아요 취소
 //            likeRepository.delete(pid, uid);
             Post post = postDataRepository.findById(pid).orElseThrow(RuntimeException::new);
             User user = userDataRepository.findById(uid).orElseThrow(RuntimeException::new);
             Like like = Like.createOne(user, post);
             likeDataRepository.delete(like);
-            postRepository.downLikeCount(pid);
+            updateLikeCount = postRepository.downLikeCount(pid);
         }
         else{
             Post post = postDataRepository.findById(pid).orElseThrow(RuntimeException::new);
             User user = userDataRepository.findById(uid).orElseThrow(RuntimeException::new);
             Like like = Like.createOne(user, post);
-
+            user.addLikes(like);
             likeDataRepository.save(like);
 //            likeRepository.save(pid, uid);
-            postRepository.upLikeCount(pid);
+            updateLikeCount = postRepository.upLikeCount(pid);
         }
+        return updateLikeCount;
     }
 
 

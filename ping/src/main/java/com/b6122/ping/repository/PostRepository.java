@@ -2,11 +2,13 @@ package com.b6122.ping.repository;
 
 import com.b6122.ping.domain.Post;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Transient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,16 +39,29 @@ public class PostRepository {
     }
 
 
-    @Modifying
-    @Query("update Post p set p.likeCount = p.likeCount + 1 where p.id =:pid")
-    public int upLikeCount(@Param("id") Long pid){
-        return 0;
+//    @Modifying
+//    @Query("update Post p set p.likeCount = p.likeCount + 1 where p.id =:pid")
+//    public int upLikeCount(@Param("id") Long pid){
+//        return 0;
+//    }
+
+//    @Modifying
+//    @Query("update Post p set p.likeCount = p.likeCount - 1 where p.id =:pid")
+//    public int downLikeCount(@Param("id") Long pid){
+//        return 0;
+//    }
+
+
+    public int upLikeCount(Long pid) {
+        return em.createQuery("update Post p set p.likeCount = p.likeCount + 1 where p.id =:pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
     }
 
-    @Modifying
-    @Query("update Post p set p.likeCount = p.likeCount - 1 where p.id =:pid")
-    public int downLikeCount(@Param("id") Long pid){
-        return 0;
+    public int downLikeCount(Long pid) {
+        return em.createQuery("update Post p set p.likeCount = p.likeCount - 1 where p.id = :pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
     }
 
 

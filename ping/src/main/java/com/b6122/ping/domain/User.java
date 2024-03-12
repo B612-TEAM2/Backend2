@@ -67,6 +67,13 @@ public class User {
     @Builder.Default
     private List<Friendship> toUserFriendships = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<Like> likes = new ArrayList<>();
+
+    public void addLikes(Like like) {
+        this.likes.add(like);
+    }
     public void addFromUserFriendships(Friendship friendship) {
         this.fromUserFriendships.add(friendship);
     }
