@@ -1,7 +1,8 @@
 ## About B612
 https://hongik-b612.notion.site/About-B612-6fba9fb0ec6c4a58bb1ed58b7b7dd641
 
-## About PINg (개발 중)
+## About PINg
+https://ping.pe.kr
 - 위치 기반의 기록 공유 웹 서비스
 - 주요 기능
   
